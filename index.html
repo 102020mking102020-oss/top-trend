@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Top Trend — استوديو صور التسعينات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=VT323&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root{
+    --bg:#100e1a; --panel:#1c1830; --panel-2:#241f3d; --line:#3a3358;
+    --ink:#f2eeff; --ink-dim:#a79fc9;
+    --cyan:#26e8d4; --magenta:#ff3f8e; --amber:#ffb020;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(255,63,142,0.14), transparent 60%),
+      radial-gradient(1000px 700px at 100% 0%, rgba(38,232,212,0.10), transparent 55%),
+      var(--bg);
+    color:var(--ink); font-family:'Space Grotesk', sans-serif; line-height:1.5; min-height:100vh;
+  }
+  a{color:var(--cyan);}
+  .wrap{max-width:1160px;margin:0 auto;padding:28px 20px 80px;}
+
+  .hero{display:flex;flex-direction:column;gap:14px;padding:32px 8px 20px;border-bottom:1px solid var(--line);margin-bottom:24px;animation:heroIn .6s ease both;}
+  @keyframes heroIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand-mark{width:30px;height:30px;flex-shrink:0;}
+  .brand-word{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:19px;letter-spacing:1px;color:var(--ink);}
+  .brand-word em{font-style:normal;background:linear-gradient(90deg,var(--cyan),var(--magenta));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .tape{display:inline-flex;align-items:center;gap:8px;width:fit-content;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);font-family:'VT323', monospace;font-size:19px;color:var(--amber);}
+  .tape .dot{width:8px;height:8px;border-radius:50%;background:var(--magenta);animation:blink 1.6s step-start infinite;}
+  @keyframes blink{50%{opacity:0.15;}}
+  h1{font-size:clamp(30px,5vw,50px);margin:0;font-weight:700;letter-spacing:-0.5px;line-height:1.06;}
+  h1 span{color:var(--cyan);}
+  .sub{max-width:64ch;color:var(--ink-dim);font-size:16.5px;margin:0;}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+  .badge{font-family:'Space Mono',monospace;font-size:12.5px;color:var(--ink-dim);border:1px solid var(--line);padding:5px 10px;border-radius:8px;background:var(--panel);}
+
+  /* tabs */
+  .tabs{display:flex;gap:8px;margin-bottom:16px;}
+  .tab{flex:1;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink-dim);cursor:pointer;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:500;}
+  .tab.active{color:var(--ink);border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan) inset;background:var(--panel-2);}
+
+  .grid{display:grid;grid-template-columns:1.05fr 1.35fr;gap:22px;align-items:start;}
+  @media (max-width:860px){ .grid{grid-template-columns:1fr;} }
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
+  .panel h2{font-size:15px;margin:0 0 14px;display:flex;align-items:center;gap:8px;}
+  .panel h2::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 3px rgba(38,232,212,0.15);}
+
+  .dropzone{border:2px dashed var(--line);border-radius:12px;padding:30px 16px;text-align:center;cursor:pointer;background:var(--panel-2);}
+  .dropzone.drag{border-color:var(--cyan);background:rgba(38,232,212,0.06);}
+  .dropzone svg{width:32px;height:32px;color:var(--ink-dim);margin-bottom:8px;}
+  .dropzone small{display:block;margin-top:6px;color:var(--ink-dim);font-size:13px;}
+  input[type=file]{display:none;}
+
+  .presets{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;}
+  .preset-btn{position:relative;border:1px solid var(--line);background:var(--panel-2);border-radius:10px;padding:10px 8px;cursor:pointer;color:var(--ink);text-align:right;font-size:13px;}
+  .preset-btn .swatch{width:100%;height:32px;border-radius:6px;margin-bottom:8px;}
+  .preset-btn.active{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan) inset;}
+  .trend-tag{display:block;margin-top:5px;font-size:10.5px;color:var(--amber);font-family:'Space Mono',monospace;}
+
+  .field{margin-top:14px;}
+  .field label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-dim);margin-bottom:6px;font-family:'Space Mono',monospace;}
+  input[type=range]{width:100%;height:4px;border-radius:2px;background:var(--line);-webkit-appearance:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--cyan);border:2px solid var(--bg);cursor:pointer;}
+  .row{display:flex;gap:10px;}
+  .row .field{flex:1;}
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:13px;}
+  .switch{position:relative;width:40px;height:22px;border-radius:999px;background:var(--line);cursor:pointer;flex-shrink:0;}
+  .switch.on{background:var(--cyan);}
+  .switch::after{content:"";position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:var(--ink);transition:transform .15s ease;}
+  .switch.on::after{transform:translateX(-18px);}
+  input[type=text],textarea,select{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 10px;font-family:'Space Grotesk',sans-serif;font-size:13.5px;margin-top:8px;}
+  textarea{resize:vertical;min-height:90px;font-size:13px;line-height:1.5;}
+  select{cursor:pointer;}
+  .stickers{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+  .sticker-btn{font-size:20px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);cursor:pointer;}
+  .sticker-btn.active{border-color:var(--magenta);background:rgba(255,63,142,0.12);}
+
+  .go-btn{width:100%;margin-top:18px;padding:13px;border:none;border-radius:10px;background:linear-gradient(90deg,var(--cyan),var(--magenta));color:#0d0c16;font-weight:700;font-size:15px;cursor:pointer;}
+  .go-btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .ghost-btn{width:100%;margin-top:10px;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);font-size:13.5px;cursor:pointer;}
+  .ghost-btn:hover{border-color:var(--cyan);}
+
+  .key-row{display:flex;gap:8px;align-items:center;}
+  .key-row input{margin-top:8px;}
+  .eye-btn{margin-top:8px;flex-shrink:0;background:var(--panel-2);border:1px solid var(--line);color:var(--ink-dim);border-radius:8px;padding:9px 12px;cursor:pointer;font-size:13px;}
+  .hint{font-size:12px;color:var(--ink-dim);margin-top:8px;line-height:1.6;}
+  .hint a{text-decoration:underline;}
+  .status-line{margin-top:12px;font-family:'Space Mono',monospace;font-size:12.5px;color:var(--amber);min-height:16px;}
+  .err-box{margin-top:10px;background:rgba(255,63,142,0.1);border:1px solid var(--magenta);color:#ffd7e6;border-radius:8px;padding:10px;font-size:12.5px;display:none;}
+
+  /* before/after */
+  .ba-wrap{position:relative;border-radius:10px;overflow:hidden;margin-bottom:18px;border:1px solid var(--line);background:#000;display:none;user-select:none;}
+  .ba-wrap img.ba-base{display:block;width:100%;}
+  .ba-wrap .ba-over{position:absolute;top:0;left:0;height:100%;width:100%;overflow:hidden;}
+  .ba-wrap .ba-over img{display:block;width:100%;height:100%;position:absolute;top:0;left:0;object-fit:cover;}
+  .ba-handle{position:absolute;top:0;bottom:0;width:2px;background:var(--cyan);cursor:ew-resize;}
+  .ba-handle::after{content:"⇔";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34px;height:34px;background:var(--cyan);color:#0d0c16;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;}
+  .ba-label{position:absolute;bottom:8px;font-family:'Space Mono',monospace;font-size:11px;background:rgba(0,0,0,0.55);padding:3px 8px;border-radius:6px;}
+  .ba-label.l{right:8px;} .ba-label.r{left:8px;}
+
+  .results-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+  .count{font-family:'Space Mono',monospace;color:var(--ink-dim);font-size:13px;}
+  .zip-btn{background:var(--panel-2);border:1px solid var(--line);color:var(--ink);padding:8px 14px;border-radius:8px;font-size:13px;cursor:pointer;}
+  .zip-btn:hover{border-color:var(--cyan);}
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;}
+  .card{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;overflow:hidden;position:relative;}
+  .card canvas,.card img{width:100%;display:block;background:#000;}
+  .card .dl{position:absolute;bottom:8px;left:8px;right:8px;background:rgba(18,15,28,0.85);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:6px 0;font-size:12px;cursor:pointer;opacity:0;transition:opacity .15s ease;font-family:'Space Mono',monospace;}
+  .card:hover .dl{opacity:1;}
+  .card.loading{display:flex;align-items:center;justify-content:center;min-height:150px;color:var(--ink-dim);font-family:'Space Mono',monospace;font-size:12px;text-align:center;padding:10px;}
+  .card.error{padding:12px;color:#ffb0c8;font-size:11.5px;font-family:'Space Mono',monospace;min-height:auto;}
+  .empty{color:var(--ink-dim);font-size:14px;padding:40px 10px;text-align:center;border:1px dashed var(--line);border-radius:10px;}
+
+  footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);color:var(--ink-dim);font-size:12.5px;font-family:'Space Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 28 L14 16 L21 22 L36 6" stroke="url(#tt-grad)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M27 6 H36 V15" stroke="url(#tt-grad)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <defs><linearGradient id="tt-grad" x1="4" y1="28" x2="36" y2="6"><stop stop-color="#26e8d4"/><stop offset="1" stop-color="#ff3f8e"/></linearGradient></defs>
+      </svg>
+      <span class="brand-word">TOP<em>TREND</em></span>
+    </div>
+    <div class="tape"><span class="dot"></span> استوديو صور التسعينات</div>
+    <h1>حوّل صورك لأقوى ترند في <span>التسعينات</span></h1>
+    <p class="sub">فلاتر ذكية بلا حدود، وبالنسبة لعشاق التقنية — وضع AI حقيقي بيستخدم نانو بنانا من جوجل بمفتاحك الخاص.</p>
+    <div class="badges">
+      <span class="badge">الفلاتر: مجانًا بالكامل وبلا حدود</span>
+      <span class="badge">AI: بمفتاحك، حسب حصة جوجل المجانية</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tabBtnFilters">🎞️ فلاتر ذكية</button>
+    <button class="tab" id="tabBtnAI">🤖 AI حقيقي (تجريبي)</button>
+  </div>
+
+  <div class="grid">
+    <!-- ===== LEFT: CONTROLS ===== -->
+    <div class="panel">
+      <h2>ارفع الصور</h2>
+      <div class="dropzone" id="dropzone">
+        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z"/></svg>
+        <div><strong>دوس هنا</strong> أو اسحب صورك</div>
+        <small>JPG أو PNG — أي عدد صور</small>
+        <input type="file" id="fileInput" accept="image/*" multiple>
+      </div>
+
+      <!-- ---- FILTERS TAB CONTENT ---- -->
+      <div id="tabFilters">
+        <h2 style="margin-top:22px;">اختار طابع الزمن</h2>
+        <div class="presets" id="presets"></div>
+
+        <h2 style="margin-top:22px;">ضبط يدوي</h2>
+        <div class="row">
+          <div class="field"><label>حبيبات الفيلم <b id="v-grain"></b></label><input type="range" id="grain" min="0" max="40" value="18"></div>
+          <div class="field"><label>خطوط الفيديو <b id="v-scan"></b></label><input type="range" id="scan" min="0" max="60" value="20"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>تشتت الألوان <b id="v-ab"></b></label><input type="range" id="aberration" min="0" max="6" value="2"></div>
+          <div class="field"><label>التعتيم الجانبي <b id="v-vig"></b></label><input type="range" id="vignette" min="0" max="60" value="30"></div>
+        </div>
+        <div class="field"><label>عطل تتبع الشريط (Glitch) <b id="v-glitch"></b></label><input type="range" id="glitch" min="0" max="40" value="0"></div>
+
+        <div class="toggle-row"><span>ضبط تلقائي ذكي حسب إضاءة الصورة</span><div class="switch on" id="autoToggle"></div></div>
+        <div class="toggle-row"><span>تسريب ضوء سينمائي</span><div class="switch" id="leakToggle"></div></div>
+        <select id="leakColor">
+          <option value="rgba(255,140,40,0.9)">تسريب دافي (برتقالي)</option>
+          <option value="rgba(38,232,212,0.85)">تسريب سماوي</option>
+          <option value="rgba(255,63,142,0.85)">تسريب وردي</option>
+        </select>
+        <div class="toggle-row"><span>برواز بولارويد</span><div class="switch" id="polaroidToggle"></div></div>
+
+        <div class="toggle-row" style="margin-top:16px;"><span>طابع التاريخ زي كاميرا زمان</span><div class="switch on" id="stampToggle"></div></div>
+        <input type="text" id="stampText" placeholder="8 . 9 . 2026">
+        <div class="toggle-row" style="margin-top:14px;"><span>تعليق تحت الصورة</span></div>
+        <input type="text" id="captionText" placeholder="مثال: صيف ٩٦">
+
+        <h2 style="margin-top:22px;">ستيكرز</h2>
+        <div class="stickers" id="stickers">
+          <span class="sticker-btn" data-e="📼">📼</span>
+          <span class="sticker-btn" data-e="⭐">⭐</span>
+          <span class="sticker-btn" data-e="💖">💖</span>
+          <span class="sticker-btn" data-e="📷">📷</span>
+          <span class="sticker-btn" data-e="✌️">✌️</span>
+        </div>
+
+        <button class="go-btn" id="renderBtn" disabled>هات لي الطابع القديم ✨</button>
+        <button class="ghost-btn" id="stripBtn" disabled>اعمل شريط فوتوبوث (أول 4 صور)</button>
+      </div>
+
+      <!-- ---- AI TAB CONTENT ---- -->
+      <div id="tabAI" style="display:none;">
+        <h2 style="margin-top:22px;">مفتاح Google المجاني</h2>
+        <div class="key-row">
+          <input type="password" id="apiKey" placeholder="الصق مفتاح Gemini API هنا">
+          <button class="eye-btn" id="toggleKey">👁</button>
+        </div>
+        <p class="hint">محتاج مفتاح Gemini API مجاني من Google AI Studio (بياخد دقيقتين، ومجاني لحد معين شهريًا). <a href="https://aistudio.google.com/apikey" target="_blank">هات مفتاحك من هنا</a></p>
+
+        <h2 style="margin-top:20px;">الموديل</h2>
+        <select id="aiModel">
+          <option value="gemini-2.5-flash-image">نانو بنانا (سريع، الأنسب للحصة المجانية)</option>
+          <option value="gemini-3-pro-image-preview">نانو بنانا برو (جودة أعلى، استهلاك أكبر من الحصة)</option>
+        </select>
+
+        <h2 style="margin-top:20px;">التعليمات للموديل</h2>
+        <textarea id="aiPrompt">حوّل الصورة دي لصورة فوتوغرافية حقيقية بأسلوب كاميرا تسعينات كلاسيكية: ألوان فيلم دافئة شوية، حبيبات فيلم واضحة وطبيعية، إضاءة فلاش كاميرا بسيطة، بدون أي تعديل في ملامح الشخص أو هوية الصورة الأصلية، والنتيجة تبان زي صورة اتلقطت فعلاً بكاميرا تحميض قديمة.</textarea>
+
+        <button class="go-btn" id="aiRenderBtn" disabled>حوّل بالـ AI الحقيقي 🤖</button>
+        <div class="status-line" id="aiStatus"></div>
+        <div class="err-box" id="aiErrBox"></div>
+      </div>
+    </div>
+
+    <!-- ===== RIGHT: RESULTS ===== -->
+    <div class="panel">
+      <div class="ba-wrap" id="baWrap">
+        <img class="ba-base" id="baBase">
+        <div class="ba-over" id="baOver"><img id="baProcessed"></div>
+        <div class="ba-handle" id="baHandle" style="left:50%;"></div>
+        <span class="ba-label l">قبل</span>
+        <span class="ba-label r">بعد</span>
+      </div>
+
+      <div class="results-head">
+        <h2 id="resultsTitle" style="margin:0;">النتيجة</h2>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="count" id="countLabel">0 صورة</span>
+          <button class="zip-btn" id="zipBtn" style="display:none;">تحميل الكل ZIP</button>
+        </div>
+      </div>
+      <div class="gallery" id="galleryFilters">
+        <div class="empty">لسه معملتش رفع لأي صورة. ارفع صورة واحدة أو أكتر وهيبان هنا شكلهم زمان.</div>
+      </div>
+      <div class="gallery" id="galleryAI" style="display:none;">
+        <div class="empty">حط مفتاحك، اختار الموديل، ودوس "حوّل بالـ AI الحقيقي".</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span class="brand-word" style="font-size:14px;">TOP<em>TREND</em></span> — تصميم: مستر محمد
+  </footer>
+</div>
+
+<script>
+/* =========================================================
+   SHARED STATE
+   ========================================================= */
+let photos = []; // {file, img}
+const $ = (id) => document.getElementById(id);
+
+/* =========================================================
+   TABS
+   ========================================================= */
+const tabBtnFilters = $("tabBtnFilters"), tabBtnAI = $("tabBtnAI");
+const tabFilters = $("tabFilters"), tabAI = $("tabAI");
+const galleryFilters = $("galleryFilters"), galleryAI = $("galleryAI");
+const resultsTitle = $("resultsTitle");
+const baWrap = $("baWrap");
+
+function setTab(which){
+  const isFilters = which === "filters";
+  tabBtnFilters.classList.toggle("active", isFilters);
+  tabBtnAI.classList.toggle("active", !isFilters);
+  tabFilters.style.display = isFilters ? "block" : "none";
+  tabAI.style.display = isFilters ? "none" : "block";
+  galleryFilters.style.display = isFilters ? "grid" : "none";
+  galleryAI.style.display = isFilters ? "none" : "grid";
+  zipBtn.style.display = (isFilters && photos.length) ? "inline-block" : "none";
+  baWrap.style.display = isFilters && photos.length ? "block" : "none";
+  resultsTitle.textContent = isFilters ? "النتيجة" : "نتائج AI";
+}
+tabBtnFilters.addEventListener("click", () => setTab("filters"));
+tabBtnAI.addEventListener("click", () => setTab("ai"));
+
+/* =========================================================
+   PRESETS
+   ========================================================= */
+const PRESETS = {
+  vhs:{ label:"VHS ريوايند", swatch:"linear-gradient(135deg,#1c2b52,#26e8d4)", cssFilter:"saturate(1.2) contrast(1.08) brightness(1.03) hue-rotate(-6deg)", tint:"rgba(30,60,130,0.16)", grain:22, scan:34, aberration:3, vignette:32, stampColor:"#26e8d4" },
+  disposable:{ label:"كاميرا التحميض", swatch:"linear-gradient(135deg,#d98a3d,#f2c879)", cssFilter:"saturate(1.05) contrast(0.98) brightness(1.08) sepia(0.18)", tint:"rgba(255,180,90,0.10)", grain:16, scan:0, aberration:0, vignette:38, stampColor:"#ffb020" },
+  neon:{ label:"نيون آركيد", swatch:"linear-gradient(135deg,#ff3f8e,#26e8d4)", cssFilter:"saturate(1.6) contrast(1.15) brightness(1.0) hue-rotate(4deg)", tint:"rgba(255,63,142,0.10)", grain:10, scan:12, aberration:4, vignette:20, stampColor:"#ff3f8e" },
+  sepia:{ label:"ألبوم قديم", swatch:"linear-gradient(135deg,#6b4a2a,#c9a06a)", cssFilter:"sepia(0.55) contrast(1.05) brightness(0.98) saturate(0.9)", tint:"rgba(90,60,20,0.12)", grain:24, scan:0, aberration:0, vignette:46, stampColor:"#ffb020" },
+  camcorder:{ label:"كاميرا الفيديو", swatch:"linear-gradient(135deg,#2b2b2b,#7d7d7d)", cssFilter:"saturate(0.75) contrast(1.1) brightness(1.0)", tint:"rgba(120,120,120,0.10)", grain:20, scan:50, aberration:3, vignette:34, stampColor:"#ffb020" },
+  clean:{ label:"بدون فلتر", swatch:"linear-gradient(135deg,#3a3358,#a79fc9)", cssFilter:"none", tint:"rgba(0,0,0,0)", grain:0, scan:0, aberration:0, vignette:0, stampColor:"#26e8d4" }
+};
+let activePreset = "vhs";
+const presetsEl = $("presets");
+function buildPresetButtons(){
+  Object.entries(PRESETS).forEach(([key, p]) => {
+    const btn = document.createElement("div");
+    btn.className = "preset-btn" + (key === activePreset ? " active" : "");
+    const trending = (key === "vhs" || key === "disposable") ? `<span class="trend-tag">🔥 ترند</span>` : "";
+    btn.innerHTML = `<div class="swatch" style="background:${p.swatch}"></div>${p.label}${trending}`;
+    btn.addEventListener("click", () => {
+      activePreset = key;
+      document.querySelectorAll(".preset-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      grainInput.value = p.grain; scanInput.value = p.scan;
+      abInput.value = p.aberration; vigInput.value = p.vignette;
+      updateSliderLabels();
+      if (photos.length) renderAll();
+    });
+    presetsEl.appendChild(btn);
+  });
+}
+buildPresetButtons();
+
+/* =========================================================
+   FILTER CONTROLS
+   ========================================================= */
+const grainInput = $("grain"), scanInput = $("scan"), abInput = $("aberration"), vigInput = $("vignette"), glitchInput = $("glitch");
+const stampTextInput = $("stampText"), captionInput = $("captionText");
+const renderBtn = $("renderBtn"), stripBtn = $("stripBtn"), zipBtn = $("zipBtn"), countLabel = $("countLabel"), galleryEl = galleryFilters;
+let stampOn = true, autoOn = true, leakOn = false, polaroidOn = false;
+let activeStickers = new Set();
+
+function todayStamp(){ const d = new Date(); return `${d.getMonth()+1} . ${d.getDate()} . ${d.getFullYear()}`; }
+stampTextInput.value = todayStamp();
+
+function updateSliderLabels(){
+  $("v-grain").textContent = grainInput.value; $("v-scan").textContent = scanInput.value;
+  $("v-ab").textContent = abInput.value; $("v-vig").textContent = vigInput.value;
+  $("v-glitch").textContent = glitchInput.value;
+}
+[grainInput, scanInput, abInput, vigInput, glitchInput].forEach(inp => {
+  inp.addEventListener("input", updateSliderLabels);
+  inp.addEventListener("change", () => { if (photos.length) renderAll(); });
+});
+updateSliderLabels();
+
+function wireSwitch(el, getter, setter){
+  el.addEventListener("click", () => {
+    const v = !getter(); setter(v); el.classList.toggle("on", v);
+    if (photos.length) renderAll();
+  });
+}
+wireSwitch($("stampToggle"), () => stampOn, v => stampOn = v);
+wireSwitch($("autoToggle"), () => autoOn, v => autoOn = v);
+wireSwitch($("leakToggle"), () => leakOn, v => leakOn = v);
+wireSwitch($("polaroidToggle"), () => polaroidOn, v => polaroidOn = v);
+$("leakColor").addEventListener("change", () => { if (photos.length) renderAll(); });
+stampTextInput.addEventListener("change", () => { if (photos.length) renderAll(); });
+captionInput.addEventListener("change", () => { if (photos.length) renderAll(); });
+
+document.querySelectorAll(".sticker-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const e = btn.dataset.e;
+    if (activeStickers.has(e)) { activeStickers.delete(e); btn.classList.remove("active"); }
+    else { activeStickers.add(e); btn.classList.add("active"); }
+    if (photos.length) renderAll();
+  });
+});
+
+/* =========================================================
+   UPLOAD
+   ========================================================= */
+const dropzone = $("dropzone"), fileInput = $("fileInput");
+dropzone.addEventListener("click", () => fileInput.click());
+["dragenter","dragover"].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.add("drag"); }));
+["dragleave","drop"].forEach(ev => dropzone.addEventListener(ev, e => { e.preventDefault(); dropzone.classList.remove("drag"); }));
+dropzone.addEventListener("drop", e => handleFiles(e.dataTransfer.files));
+fileInput.addEventListener("change", e => handleFiles(e.target.files));
+
+function handleFiles(fileList){
+  const files = Array.from(fileList).filter(f => f.type.startsWith("image/"));
+  if (!files.length) return;
+  let pending = files.length;
+  files.forEach(file => {
+    const img = new Image();
+    img.onload = () => {
+      photos.push({ file, img });
+      pending--;
+      if (pending === 0) {
+        renderBtn.disabled = false; stripBtn.disabled = photos.length < 2;
+        aiRenderBtn.disabled = false;
+        renderAll();
+      }
+    };
+    img.src = URL.createObjectURL(file);
+  });
+}
+renderBtn.addEventListener("click", renderAll);
+
+/* =========================================================
+   SMART / EFFECT HELPERS
+   ========================================================= */
+function computeAutoAdjust(img){
+  const s = 40;
+  const c = document.createElement("canvas"); c.width = s; c.height = s;
+  const cx = c.getContext("2d");
+  cx.drawImage(img, 0, 0, s, s);
+  const d = cx.getImageData(0,0,s,s).data;
+  let total = 0;
+  for (let i=0;i<d.length;i+=4){ total += 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2]; }
+  const avg = total / (d.length/4); // 0-255
+  let brightnessMul = 1, contrastMul = 1;
+  if (avg < 85){ brightnessMul = 1.18; contrastMul = 1.05; }
+  else if (avg > 175){ brightnessMul = 0.94; contrastMul = 1.02; }
+  return { brightnessMul, contrastMul, avg };
+}
+
+function chromaticAberrationAndGrain(ctx, w, h, abAmount, grainAmount){
+  if (abAmount <= 0 && grainAmount <= 0) return;
+  const src = ctx.getImageData(0, 0, w, h);
+  const sd = src.data;
+  const dst = ctx.createImageData(w, h);
+  const dd = dst.data;
+  const off = Math.round(abAmount);
+  for (let y = 0; y < h; y++){
+    const rowStart = y * w;
+    for (let x = 0; x < w; x++){
+      const idx = (rowStart + x) * 4;
+      if (off > 0){
+        const rx = x - off < 0 ? 0 : (x - off);
+        const bx = x + off >= w ? w - 1 : (x + off);
+        const ridx = (rowStart + rx) * 4, bidx = (rowStart + bx) * 4;
+        dd[idx]=sd[ridx]; dd[idx+1]=sd[idx+1]; dd[idx+2]=sd[bidx+2]; dd[idx+3]=sd[idx+3];
+      } else {
+        dd[idx]=sd[idx]; dd[idx+1]=sd[idx+1]; dd[idx+2]=sd[idx+2]; dd[idx+3]=sd[idx+3];
+      }
+      if (grainAmount > 0){
+        const n = (Math.random() - 0.5) * grainAmount;
+        dd[idx]=Math.min(255,Math.max(0,dd[idx]+n));
+        dd[idx+1]=Math.min(255,Math.max(0,dd[idx+1]+n));
+        dd[idx+2]=Math.min(255,Math.max(0,dd[idx+2]+n));
+      }
+    }
+  }
+  ctx.putImageData(dst, 0, 0);
+}
+
+function applyGlitch(ctx, w, h, intensity){
+  if (intensity <= 0) return;
+  const src = ctx.getImageData(0,0,w,h);
+  const sd = src.data;
+  const dst = ctx.createImageData(w,h);
+  dst.data.set(sd);
+  const dd = dst.data;
+  const bands = Math.round(intensity/9) + 1;
+  for (let b=0; b<bands; b++){
+    const bandH = Math.max(2, Math.round(Math.random()*h*0.06));
+    const y0 = Math.floor(Math.random()*Math.max(1,(h-bandH)));
+    const shift = Math.round((Math.random()-0.5)*intensity*1.6);
+    for (let y=y0; y<y0+bandH; y++){
+      for (let x=0; x<w; x++){
+        const sx = Math.min(w-1, Math.max(0, x - shift));
+        const srcIdx = (y*w+sx)*4, dstIdx = (y*w+x)*4;
+        dd[dstIdx]=sd[srcIdx]; dd[dstIdx+1]=sd[srcIdx+1]; dd[dstIdx+2]=sd[srcIdx+2]; dd[dstIdx+3]=sd[srcIdx+3];
+      }
+    }
+  }
+  ctx.putImageData(dst, 0, 0);
+}
+
+function drawVignette(ctx, w, h, strength){
+  if (strength <= 0) return;
+  const grad = ctx.createRadialGradient(w/2, h/2, Math.min(w,h)*0.3, w/2, h/2, Math.max(w,h)*0.7);
+  grad.addColorStop(0, "rgba(0,0,0,0)");
+  grad.addColorStop(1, `rgba(0,0,0,${Math.min(0.85, strength/60)})`);
+  ctx.save(); ctx.globalCompositeOperation = "multiply"; ctx.fillStyle = grad; ctx.fillRect(0,0,w,h); ctx.restore();
+}
+function drawScanlines(ctx, w, h, opacityPct){
+  if (opacityPct <= 0) return;
+  ctx.save(); ctx.globalAlpha = Math.min(0.5, opacityPct/150); ctx.fillStyle = "#000000";
+  for (let y = 0; y < h; y += 3){ ctx.fillRect(0, y, w, 1); }
+  ctx.restore();
+}
+function drawLightLeak(ctx, w, h, color){
+  ctx.save();
+  ctx.globalCompositeOperation = "screen";
+  const grad = ctx.createLinearGradient(w*0.95, 0, w*0.25, h*0.65);
+  grad.addColorStop(0, color); grad.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = grad; ctx.globalAlpha = 0.6; ctx.fillRect(0,0,w,h);
+  ctx.restore();
+}
+function drawStamp(ctx, w, h, text, color){
+  if (!text) return;
+  const fontSize = Math.max(14, Math.round(w * 0.032));
+  ctx.save(); ctx.font = `${fontSize}px 'VT323', monospace`; ctx.textAlign = "right"; ctx.textBaseline = "bottom";
+  ctx.shadowColor = color; ctx.shadowBlur = 6; ctx.fillStyle = color;
+  ctx.fillText(text, w - 16, h - 16); ctx.restore();
+}
+function drawCaption(ctx, w, h, text){
+  if (!text) return;
+  const fontSize = Math.max(14, Math.round(w * 0.038));
+  ctx.save(); ctx.font = `${fontSize}px 'Space Mono', monospace`; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+  ctx.fillStyle = "rgba(255,255,255,0.92)"; ctx.shadowColor = "rgba(0,0,0,0.6)"; ctx.shadowBlur = 4;
+  ctx.fillText(text, w/2, h - 16); ctx.restore();
+}
+function drawStickers(ctx, w, h, stickers){
+  if (!stickers.size) return;
+  const positions = [[0.12,0.14],[0.85,0.16],[0.15,0.85],[0.85,0.85],[0.5,0.12]];
+  let i = 0; const size = Math.round(w*0.09);
+  ctx.save(); ctx.font = `${size}px sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  stickers.forEach(e => { const [px, py] = positions[i % positions.length]; ctx.fillText(e, w*px, h*py); i++; });
+  ctx.restore();
+}
+function wrapInPolaroid(sourceCanvas){
+  const border = Math.round(sourceCanvas.width * 0.06);
+  const bottomBorder = Math.round(sourceCanvas.width * 0.16);
+  const w = sourceCanvas.width + border*2;
+  const h = sourceCanvas.height + border + bottomBorder;
+  const c = document.createElement("canvas"); c.width = w; c.height = h;
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "#f5f2ea"; ctx.fillRect(0,0,w,h);
+  ctx.drawImage(sourceCanvas, border, border);
+  return c;
+}
+
+/* =========================================================
+   MAIN RENDER PIPELINE (filters)
+   ========================================================= */
+function processPhoto(photo){
+  const preset = PRESETS[activePreset];
+  const img = photo.img;
+  const maxW = 1000;
+  const scale = Math.min(1, maxW / img.naturalWidth);
+  const w = Math.round(img.naturalWidth * scale), h = Math.round(img.naturalHeight * scale);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext("2d");
+
+  let filterStr = preset.cssFilter;
+  if (autoOn){
+    const adj = computeAutoAdjust(img);
+    filterStr = (filterStr === "none" ? "" : filterStr) + ` brightness(${adj.brightnessMul}) contrast(${adj.contrastMul})`;
+  }
+  ctx.filter = filterStr;
+  ctx.drawImage(img, 0, 0, w, h);
+  ctx.filter = "none";
+
+  if (preset.tint && preset.tint !== "rgba(0,0,0,0)"){
+    ctx.save(); ctx.fillStyle = preset.tint; ctx.globalCompositeOperation = "overlay"; ctx.fillRect(0,0,w,h); ctx.restore();
+  }
+  if (leakOn) drawLightLeak(ctx, w, h, $("leakColor").value);
+
+  const grain = Number(grainInput.value), ab = Number(abInput.value);
+  chromaticAberrationAndGrain(ctx, w, h, ab, grain);
+  applyGlitch(ctx, w, h, Number(glitchInput.value));
+
+  drawVignette(ctx, w, h, Number(vigInput.value));
+  drawScanlines(ctx, w, h, Number(scanInput.value));
+  drawStickers(ctx, w, h, activeStickers);
+  drawCaption(ctx, w, h, captionInput.value.trim());
+  if (stampOn) drawStamp(ctx, w, h, stampTextInput.value.trim(), preset.stampColor);
+
+  return polaroidOn ? wrapInPolaroid(canvas) : canvas;
+}
+
+function renderAll(){
+  galleryEl.innerHTML = "";
+  countLabel.textContent = `${photos.length} صورة`;
+  const isFilters = tabFilters.style.display !== "none";
+  zipBtn.style.display = (photos.length && isFilters) ? "inline-block" : "none";
+  if (!photos.length){
+    galleryEl.innerHTML = `<div class="empty">لسه معملتش رفع لأي صورة. ارفع صورة واحدة أو أكتر وهيبان هنا شكلهم زمان.</div>`;
+    baWrap.style.display = "none";
+    return;
+  }
+  photos.forEach((photo, i) => {
+    const canvas = processPhoto(photo);
+    const card = document.createElement("div");
+    card.className = "card";
+    card.appendChild(canvas);
+    const dl = document.createElement("button");
+    dl.className = "dl"; dl.textContent = "تحميل";
+    dl.addEventListener("click", () => downloadCanvas(canvas, `90s-photo-${i+1}.png`));
+    card.appendChild(dl);
+    galleryEl.appendChild(card);
+    photo.canvas = canvas;
+  });
+  updateBeforeAfter();
+  if (isFilters) baWrap.style.display = "block";
+}
+
+/* before / after slider (first photo) */
+const baBase = $("baBase"), baProcessed = $("baProcessed"), baHandle = $("baHandle"), baOver = $("baOver");
+function updateBeforeAfter(){
+  if (!photos.length) return;
+  const first = photos[0];
+  baBase.src = first.img.src;
+  baProcessed.src = first.canvas.toDataURL("image/png");
+}
+let dragging = false;
+function setHandle(pct){
+  pct = Math.min(96, Math.max(4, pct));
+  baHandle.style.left = pct + "%";
+  baOver.style.width = pct + "%";
+}
+baHandle.addEventListener("mousedown", () => dragging = true);
+window.addEventListener("mouseup", () => dragging = false);
+window.addEventListener("mousemove", e => {
+  if (!dragging) return;
+  const rect = baWrap.getBoundingClientRect();
+  setHandle(((e.clientX - rect.left) / rect.width) * 100);
+});
+baHandle.addEventListener("touchstart", () => dragging = true, {passive:true});
+window.addEventListener("touchend", () => dragging = false);
+window.addEventListener("touchmove", e => {
+  if (!dragging) return;
+  const t = e.touches[0]; const rect = baWrap.getBoundingClientRect();
+  setHandle(((t.clientX - rect.left) / rect.width) * 100);
+}, {passive:true});
+setHandle(50);
+
+function downloadCanvas(canvas, name){
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = name; a.click();
+    URL.revokeObjectURL(url);
+  }, "image/png");
+}
+
+/* photo strip */
+stripBtn.addEventListener("click", () => {
+  const set = photos.slice(0,4).map(p => p.canvas || processPhoto(p));
+  if (!set.length) return;
+  const pad = 16;
+  const w = Math.max(...set.map(c=>c.width)) + pad*2;
+  const cellH = Math.max(...set.map(c => c.height * (w-pad*2)/c.width));
+  const h = pad + set.length*(cellH+pad);
+  const strip = document.createElement("canvas"); strip.width = w; strip.height = h;
+  const ctx = strip.getContext("2d");
+  ctx.fillStyle = "#f5f2ea"; ctx.fillRect(0,0,w,h);
+  set.forEach((c,i) => { ctx.drawImage(c, pad, pad + i*(cellH+pad), w-pad*2, cellH); });
+  downloadCanvas(strip, "90s-photobooth-strip.png");
+});
+
+/* zip all */
+zipBtn.addEventListener("click", async () => {
+  if (!photos.length) return;
+  zipBtn.textContent = "بيتجهز...";
+  const zip = new JSZip();
+  for (let i = 0; i < photos.length; i++){
+    const canvas = photos[i].canvas || processPhoto(photos[i]);
+    const blob = await new Promise(res => canvas.toBlob(res, "image/png"));
+    zip.file(`90s-photo-${i+1}.png`, blob);
+  }
+  const content = await zip.generateAsync({ type: "blob" });
+  const url = URL.createObjectURL(content);
+  const a = document.createElement("a"); a.href = url; a.download = "90s-photos.zip"; a.click();
+  URL.revokeObjectURL(url);
+  zipBtn.textContent = "تحميل الكل ZIP";
+});
+
+/* =========================================================
+   AI TAB (real Gemini / Nano Banana)
+   ========================================================= */
+const apiKeyInput = $("apiKey"), toggleKeyBtn = $("toggleKey");
+const aiModelSelect = $("aiModel"), aiPromptInput = $("aiPrompt");
+const aiRenderBtn = $("aiRenderBtn"), aiStatus = $("aiStatus"), aiErrBox = $("aiErrBox");
+
+toggleKeyBtn.addEventListener("click", () => {
+  apiKeyInput.type = apiKeyInput.type === "password" ? "text" : "password";
+});
+
+function imageToBase64(img, maxDim=1024){
+  const scale = Math.min(1, maxDim/Math.max(img.naturalWidth, img.naturalHeight));
+  const w = Math.round(img.naturalWidth*scale), h = Math.round(img.naturalHeight*scale);
+  const c = document.createElement("canvas"); c.width = w; c.height = h;
+  c.getContext("2d").drawImage(img, 0, 0, w, h);
+  return c.toDataURL("image/jpeg", 0.92).split(",")[1];
+}
+
+async function callNanoBanana(base64Jpeg, apiKey, model, prompt){
+  const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+    body: JSON.stringify({
+      contents: [{ parts: [
+        { text: prompt },
+        { inline_data: { mime_type: "image/jpeg", data: base64Jpeg } }
+      ]}],
+      generationConfig: { responseModalities: ["TEXT", "IMAGE"] }
+    })
+  });
+  if (!resp.ok){
+    const errText = await resp.text().catch(() => "");
+    throw new Error(`HTTP ${resp.status} — ${errText.slice(0,220)}`);
+  }
+  const data = await resp.json();
+  const parts = data?.candidates?.[0]?.content?.parts || [];
+  const imgPart = parts.find(p => p.inlineData || p.inline_data);
+  if (!imgPart){
+    const textPart = parts.find(p => p.text);
+    throw new Error(textPart ? `الموديل رد بنص بس: "${textPart.text.slice(0,150)}"` : "الموديل مرجعش صورة، جرب تعدل البرومبت.");
+  }
+  const inline = imgPart.inlineData || imgPart.inline_data;
+  const mime = inline.mimeType || inline.mime_type || "image/png";
+  return `data:${mime};base64,${inline.data}`;
+}
+
+aiRenderBtn.addEventListener("click", async () => {
+  const apiKey = apiKeyInput.value.trim();
+  aiErrBox.style.display = "none";
+  if (!apiKey){ aiErrBox.textContent = "لازم تحط مفتاح Gemini API الأول."; aiErrBox.style.display = "block"; return; }
+  if (!photos.length){ return; }
+
+  const model = aiModelSelect.value, prompt = aiPromptInput.value.trim();
+  aiRenderBtn.disabled = true;
+  galleryAI.innerHTML = "";
+  countLabel.textContent = `${photos.length} صورة`;
+
+  const cards = photos.map((_, i) => {
+    const card = document.createElement("div");
+    card.className = "card loading";
+    card.textContent = `صورة ${i+1}: في الانتظار...`;
+    galleryAI.appendChild(card);
+    return card;
+  });
+
+  for (let i = 0; i < photos.length; i++){
+    aiStatus.textContent = `بيحوّل صورة ${i+1} من ${photos.length}...`;
+    cards[i].textContent = "بيحوّل...";
+    try {
+      const b64 = imageToBase64(photos[i].img);
+      const resultUrl = await callNanoBanana(b64, apiKey, model, prompt);
+      cards[i].className = "card";
+      cards[i].innerHTML = "";
+      const img = document.createElement("img");
+      img.src = resultUrl;
+      cards[i].appendChild(img);
+      const dl = document.createElement("button");
+      dl.className = "dl"; dl.textContent = "تحميل";
+      dl.addEventListener("click", () => {
+        const a = document.createElement("a"); a.href = resultUrl; a.download = `90s-ai-${i+1}.png`; a.click();
+      });
+      cards[i].appendChild(dl);
+    } catch (err){
+      cards[i].className = "card error";
+      cards[i].textContent = `صورة ${i+1}: ${err.message}`;
+    }
+    await new Promise(res => setTimeout(res, 500));
+  }
+  aiStatus.textContent = "خلصت!";
+  aiRenderBtn.disabled = false;
+});
+</script>
+</body>
+</html>
